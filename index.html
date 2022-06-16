@@ -1,3 +1,8 @@
+<!-- 
+  TODO: 
+  * 너무 비효율적인 알고리즘을 사용하고 있음. 1초마다 O(n^2)의 연산을 수행해야 함.
+  FIXME: 
+-->
 <!DOCTYPE html>
 <html lang="ko">
   <head>
@@ -7,13 +12,100 @@
   </head>
   <body>
     <h1>Cellular Automata</h1>
-    <canvas id="canvas"></canvas>
+    <canvas id="canvas" style="border: 1px solid black"></canvas>
   </body>
   <script>
+    const number = 50;
+    // state 배열 선언
+    let state = new Array(number);
+    for (let i = 0; i < state.length; i++) {
+      state[i] = new Array(number);
+    }
+
+    // state 배열 초기화
+    for (let i = 0; i < state.length; i++) {
+      for (let j = 0; j < state[i].length; j++) {
+        state[i][j] = 0;
+      }
+    }
+
+    // 5개의 초기값 배정
+    const initNumber = 200; // 초기값 개수
+    for (let i = 0; i < initNumber; i++) {
+      const startX = Math.round(Math.random() * (number - 1));
+      const startY = Math.round(Math.random() * (number - 1));
+      state[startX][startY] = 1;
+    }
+
     const canvas = document.getElementById("canvas");
+    canvas.width = number * 10;
+    canvas.height = number * 10;
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, 10, 10);
+    function render() {
+      for (let i = 0; i < state.length; i++) {
+        for (let j = 0; j < state[i].length; j++) {
+          if (state[i][j] == 1) {
+            ctx.fillStyle = "black";
+            ctx.fillRect(i * 10, j * 10, 10, 10);
+          } else {
+            ctx.fillStyle = "white";
+            ctx.fillRect(i * 10, j * 10, 10, 10);
+          }
+        }
+      }
+    }
+
+    // canvas에 초기값 그리기
+    render();
+
+    setInterval(function () {
+      let trueCnt = 0;
+      for (let i = 0; i < state.length; i++) {
+        for (let j = 0; j < state[i].length; j++) {
+          // 규칙 1: 죽은 세포의 이웃 중 정확히 세 개가 살아 있으면 그 세포는 살아난다.
+          if (state[i][j] == 0) {
+            try {
+              [
+                state[i - 1][j],
+                state[i + 1][j],
+                state[i][j - 1],
+                state[i][j + 1],
+                state[i - 1][j - 1],
+                state[i + 1][j - 1],
+                state[i - 1][j + 1],
+                state[i + 1][j + 1],
+              ].forEach((state) => {
+                if (state) trueCnt++;
+              });
+            } catch (err) {}
+
+            if (trueCnt == 3) state[i][j] = 1;
+
+            trueCnt = 0;
+          }
+          // 규칙 2: 살아 있는 세포의 이웃 중에 두 개나 세 개가 살아 있으면, 그 세포는 계속 살아 있는 상태를 유지하고, 이외에는 ‘외로워서’, 또는 ‘숨이 막혀서’ 죽어버린다.
+          else {
+            try {
+              [
+                state[i - 1][j],
+                state[i + 1][j],
+                state[i][j - 1],
+                state[i][j + 1],
+                state[i - 1][j - 1],
+                state[i + 1][j - 1],
+                state[i - 1][j + 1],
+                state[i + 1][j + 1],
+              ].forEach((state) => {
+                if (state) trueCnt++;
+              });
+            } catch (err) {}
+            if (!(trueCnt == 2 || trueCnt == 3)) state[i][j] = 0;
+            trueCnt = 0;
+          }
+        }
+      }
+      render();
+    }, 1000);
   </script>
 </html>
