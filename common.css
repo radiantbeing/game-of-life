@@ -61,3 +61,12 @@ nav {
   height: 1.2rem;
   fill: white;
 }
+
+/* Canvas */
+.canvas-wrapper {
+  border: 1px solid black;
+  width: 92vw;
+  height: calc(100% - 114px);
+  margin: 32px 4vw;
+  overflow: hidden;
+}

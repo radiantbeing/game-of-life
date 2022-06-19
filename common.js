@@ -1,5 +1,18 @@
-const rangeX = parseInt(window.screen.width / 10);
-const rangeY = parseInt(window.screen.height / 10);
+const screenSize = { width: window.screen.width, height: window.screen.height };
+
+let cellSize; // Cell 하나의 크기
+
+if (screenSize.width < 576)
+  // Mobile
+  cellSize = 5;
+else if (screenSize.width < 993)
+  // Tablet
+  cellSize = 6;
+// PC
+else cellSize = 8;
+
+const rangeX = parseInt(screenSize.width / cellSize); // 상태 공간 상에서 X축의 범위
+const rangeY = parseInt(screenSize.height / cellSize); // 상태 공간 상에서 Y축의 범위
 
 const mode = "live"; // "live" or "test"
 const testPattern = "glider"; // "block", "blinker", "boat", "toad", "glider"
@@ -11,8 +24,8 @@ const states = {
 
 // canvas 준비
 const canvas = document.getElementById("canvas");
-canvas.width = rangeX * 10;
-canvas.height = rangeY * 10;
+canvas.width = rangeX * cellSize;
+canvas.height = rangeY * cellSize;
 const ctx = canvas.getContext("2d");
 
 function render(stateSpace) {
@@ -20,10 +33,10 @@ function render(stateSpace) {
     for (let j = 0; j < stateSpace[i].length; j++) {
       if (stateSpace[i][j].getState() == states.ALIVE) {
         ctx.fillStyle = "black";
-        ctx.fillRect(i * 10, j * 10, 10, 10);
+        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
       } else {
         ctx.fillStyle = "white";
-        ctx.fillRect(i * 10, j * 10, 10, 10);
+        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
       }
     }
   }
@@ -81,7 +94,6 @@ class Cell {
 }
 
 // 상태 공간 생성
-console.log(rangeX);
 const stateSpace = new Array(rangeX);
 for (let i = 0; i < stateSpace.length; i++) {
   stateSpace[i] = new Array(rangeY);
