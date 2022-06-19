@@ -1,44 +1,36 @@
-const screenSize = { width: window.screen.width, height: window.screen.height };
+function getCellSize(screenW) {
+  let cellSize;
+  if (screenW < 576) cellSize = 5;
+  else if (screenW < 993) cellSize = 6;
+  else cellSize = 8;
+  return cellSize;
+}
 
-let cellSize; // Cell 하나의 크기
+// Variables of device screen
+const screenW = window.screen.width;
+const screenH = window.screen.height;
 
-if (screenSize.width < 576)
-  // Mobile
-  cellSize = 5;
-else if (screenSize.width < 993)
-  // Tablet
-  cellSize = 6;
-// PC
-else cellSize = 8;
+const cellSize = getCellSize(); // Cell 하나의 크기
 
-const rangeX = parseInt(screenSize.width / cellSize); // 상태 공간 상에서 X축의 범위
-const rangeY = parseInt(screenSize.height / cellSize); // 상태 공간 상에서 Y축의 범위
+// Variables of state space
+const rangeX = parseInt(screenW / cellSize); // 상태 공간 열의 길이
+const rangeY = parseInt(screenH / cellSize); // 상태 공간 행의 길이
 
-const mode = "live"; // "live" or "test"
-const testPattern = "glider"; // "block", "blinker", "boat", "toad", "glider"
+// Variables of state
+const ALIVE = 1; // 생존 상태
+const DEATH = 0; // 죽음 상태
 
-const states = {
-  ALIVE: 1,
-  DEATH: 0,
-};
-
-// canvas 준비
+// Set up canvas
 const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 canvas.width = rangeX * cellSize;
 canvas.height = rangeY * cellSize;
-const ctx = canvas.getContext("2d");
 
-function render(stateSpace) {
-  for (let i = 0; i < stateSpace.length; i++) {
-    for (let j = 0; j < stateSpace[i].length; j++) {
-      if (stateSpace[i][j].getState() == states.ALIVE) {
-        ctx.fillStyle = "black";
-        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-      } else {
-        ctx.fillStyle = "white";
-        ctx.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-      }
-    }
+function render(cell, x, y, cellSize) {
+  if (cell.getT() === true) {
+    ctx.fillStyle = cell.getState() == ALIVE ? "black" : "white";
+    ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+    cell.setT(false);
   }
 }
 
@@ -46,6 +38,10 @@ function render(stateSpace) {
 class Cell {
   constructor(state) {
     this.setState(state);
+    // 상태 전이 Flag
+    // 상태 전이가 발생하면 true로 변화한다.
+    // true로 바뀐 flag는 render 함수에서 렌더링 후 false로 바꿔준다.
+    this.T = false;
   }
 
   setState(state) {
@@ -54,6 +50,14 @@ class Cell {
 
   getState() {
     return this.state;
+  }
+
+  setT(bool) {
+    this.T = bool;
+  }
+
+  getT() {
+    return this.T;
   }
 
   decideLife(iStateSpace, X, Y) {
@@ -75,20 +79,24 @@ class Cell {
       if (coordinate[0] < 0 || coordinate[0] >= rangeX) continue;
       if (coordinate[1] < 0 || coordinate[1] >= rangeY) continue;
 
-      const cell = iStateSpace[coordinate[0]][coordinate[1]];
+      const tempCell = iStateSpace[coordinate[0]][coordinate[1]];
 
-      if (cell.getState() === states.ALIVE) aliveCnt++;
+      if (tempCell.getState() === ALIVE) aliveCnt++;
     }
 
-    switch (iStateSpace[X][Y].getState()) {
+    const iCell = iStateSpace[X][Y];
+    const iCellState = iCell.getState();
+
+    if (iCellState === ALIVE) {
       // 살아 있는 세포의 이웃 중에 두 개나 세 개가 살아 있으면, 그 세포는 계속 살아 있는 상태를 유지하고, 이외에는 ‘외로워서’, 또는 ‘숨이 막혀서’ 죽어버린다.
-      case states.ALIVE:
-        this.setState(aliveCnt === 2 || aliveCnt === 3 ? states.ALIVE : states.DEATH);
-        break;
+      this.setState(aliveCnt === 2 || aliveCnt === 3 ? ALIVE : DEATH);
+    } else {
       // 죽은 세포의 이웃 중 정확히 세 개가 살아 있으면 그 세포는 살아난다(‘태어난다’).
-      case states.DEATH:
-        this.setState(aliveCnt === 3 ? states.ALIVE : states.DEATH);
-        break;
+      this.setState(aliveCnt === 3 ? ALIVE : DEATH);
+    }
+
+    if (this.getState() !== iCellState) {
+      this.setT(true);
     }
   }
 }
@@ -101,54 +109,14 @@ for (let i = 0; i < stateSpace.length; i++) {
 
 // 상태 공간 초기화
 for (let i = 0; i < stateSpace.length; i++) {
-  for (let j = 0; j < stateSpace[i].length; j++) stateSpace[i][j] = new Cell(states.DEATH);
+  for (let j = 0; j < stateSpace[i].length; j++) stateSpace[i][j] = new Cell(DEATH);
 }
 
 // 초기 생존 세포 할당
-if (mode === "live") {
-  for (let i = 0; i < stateSpace.length; i++) {
-    for (let j = 0; j < stateSpace[i].length; j++) stateSpace[i][j].setState(Math.round(Math.random()));
-  }
-} else {
-  const pattern = {
-    block: () => {
-      stateSpace[0][0].setState(1);
-      stateSpace[1][0].setState(1);
-      stateSpace[0][1].setState(1);
-      stateSpace[1][1].setState(1);
-    },
-    blinker: () => {
-      stateSpace[1][0].setState(1);
-      stateSpace[1][1].setState(1);
-      stateSpace[1][2].setState(1);
-    },
-    boat: () => {
-      stateSpace[0][0].setState(1);
-      stateSpace[1][0].setState(1);
-      stateSpace[0][1].setState(1);
-      stateSpace[2][1].setState(1);
-      stateSpace[1][2].setState(1);
-    },
-    toad: () => {
-      stateSpace[1][1].setState(1);
-      stateSpace[2][1].setState(1);
-      stateSpace[3][1].setState(1);
-      stateSpace[0][2].setState(1);
-      stateSpace[1][2].setState(1);
-      stateSpace[2][2].setState(1);
-    },
-    glider: () => {
-      stateSpace[2][0].setState(1);
-      stateSpace[0][1].setState(1);
-      stateSpace[2][1].setState(1);
-      stateSpace[1][2].setState(1);
-      stateSpace[2][2].setState(1);
-    },
-  };
-  pattern[testPattern]();
-}
 
-render(stateSpace);
+for (let i = 0; i < stateSpace.length; i++) {
+  for (let j = 0; j < stateSpace[i].length; j++) stateSpace[i][j].setState(Math.round(Math.random()));
+}
 
 setInterval(() => {
   // 세포 생사 결정을 위한 현재 상태 공간 복사
@@ -159,11 +127,13 @@ setInterval(() => {
   }
 
   // 세포 생사 결정
+  console.time();
   for (let i = 0; i < stateSpace.length; i++) {
     for (let j = 0; j < stateSpace[i].length; j++) {
-      stateSpace[i][j].decideLife(iStateSpace, i, j);
+      const cell = stateSpace[i][j];
+      cell.decideLife(iStateSpace, i, j);
+      render(cell, i, j, cellSize);
     }
   }
-
-  render(stateSpace);
-}, 100);
+  console.timeEnd();
+}, 0);
