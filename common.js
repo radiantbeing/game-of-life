@@ -1,5 +1,5 @@
-const rangeX = window.screen.width / 10;
-const rangeY = window.screen.height / 10;
+const rangeX = parseInt(window.screen.width / 10);
+const rangeY = parseInt(window.screen.height / 10);
 
 const mode = "live"; // "live" or "test"
 const testPattern = "glider"; // "block", "blinker", "boat", "toad", "glider"
@@ -81,6 +81,7 @@ class Cell {
 }
 
 // 상태 공간 생성
+console.log(rangeX);
 const stateSpace = new Array(rangeX);
 for (let i = 0; i < stateSpace.length; i++) {
   stateSpace[i] = new Array(rangeY);
