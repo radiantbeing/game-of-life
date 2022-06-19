@@ -1,16 +1,11 @@
-function getCellSize(screenW) {
-  let cellSize;
-  if (screenW < 576) cellSize = 5;
-  else if (screenW < 993) cellSize = 6;
-  else cellSize = 8;
-  return cellSize;
-}
-
 // Variables of device screen
 const screenW = window.screen.width;
 const screenH = window.screen.height;
 
-const cellSize = getCellSize(); // Cell 하나의 크기
+let cellSize; // Cell 하나의 크기
+if (screenW < 576) cellSize = 4;
+else if (screenW < 993) cellSize = 6;
+else cellSize = 8;
 
 // Variables of state space
 const rangeX = parseInt(screenW / cellSize); // 상태 공간 열의 길이
@@ -127,7 +122,6 @@ setInterval(() => {
   }
 
   // 세포 생사 결정
-  console.time();
   for (let i = 0; i < stateSpace.length; i++) {
     for (let j = 0; j < stateSpace[i].length; j++) {
       const cell = stateSpace[i][j];
@@ -135,5 +129,4 @@ setInterval(() => {
       render(cell, i, j, cellSize);
     }
   }
-  console.timeEnd();
 }, 0);
