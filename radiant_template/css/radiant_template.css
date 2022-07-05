@@ -1,0 +1,236 @@
+@import url("https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.css");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css");
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard-dynamic-subset.css");
+
+/* Override body of Skeleton */
+body {
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+    "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR",
+    "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    sans-serif;
+}
+
+/* Variables according to Dark Mode  */
+body,
+body[data-theme="light"] {
+  --font-color: #292929;
+  --background-color: #ffffff;
+  --header-color: #ffffff;
+  --icon-filter: none;
+}
+
+body[data-theme="dark"] {
+  --font-color: #ffffff;
+  --background-color: #292929;
+  --header-color: #222222;
+  --icon-filter: invert();
+}
+
+/* ========== Coloring ========== */
+body {
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+a.navbar-brand-title {
+  color: var(--font-color);
+}
+
+.navbar-social-item > a > img,
+img.navbar-brand-logo,
+.navbar-toggle > img {
+  filter: var(--icon-filter);
+}
+
+/* ========== Navbar ========== */
+nav.navbar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid rgba(100, 100, 100, 0.5);
+  box-sizing: border-box;
+  background-color: var(--header-color);
+}
+
+div.navbar-brand {
+  display: flex;
+  margin: 1.6rem 5vw;
+  align-items: center;
+}
+
+img.navbar-brand-logo {
+  width: 4rem;
+  height: 4rem;
+}
+
+a.navbar-brand-title {
+  --background-color: white;
+  text-decoration: none;
+  font-size: 1.8rem;
+  margin-left: 1.6rem;
+}
+
+div.navbar-navs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  display: none;
+}
+
+div.navbar-navs.active {
+  display: flex;
+}
+
+ul.navbar-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+li.navbar-link-item {
+  list-style: none;
+  margin-top: 0.8rem;
+  margin-bottom: calc(0.8rem - 1px);
+  transition: border-color 0.5s;
+  border-bottom: 1px solid transparent;
+}
+
+li.navbar-link-item:hover {
+  border-color: var(--font-color);
+}
+
+li.navbar-link-item > a {
+  font-size: 1.6rem;
+  text-decoration: none;
+  color: var(--font-color);
+  --background-color: white;
+}
+
+ul.navbar-socials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.6rem 0;
+}
+
+li.navbar-social-item {
+  list-style: none;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 1.6rem;
+}
+
+li.navbar-social-item:first-child {
+  margin-left: 0;
+}
+
+li.navbar-social-item > a {
+  display: inline-block;
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+li.navbar-social-item > a > img {
+  width: 2.2rem;
+  height: 2.2rem;
+}
+
+a.navbar-toggle {
+  position: absolute;
+  top: 2.1rem;
+  right: 5vw;
+  width: 3rem;
+  height: 3rem;
+}
+
+a.navbar-toggle > img {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+  nav.navbar {
+    height: 8rem;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  div.navbar-brand {
+    margin: 0;
+  }
+
+  img.navbar-brand-logo {
+    width: 4.5rem;
+    height: 4.5rem;
+  }
+
+  a.navbar-brand-title {
+    font-size: 2.2rem;
+    margin-left: 2rem;
+  }
+
+  div.navbar-navs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  ul.navbar-links {
+    flex-direction: row;
+  }
+
+  li.navbar-link-item {
+    padding: 0.4rem 0.8rem;
+    margin-left: 1rem;
+    margin-bottom: 0;
+    margin-top: 0;
+  }
+
+  li.navbar-link-item:hover {
+    border-bottom: 1px solid var(--font-color);
+    margin-bottom: 0px;
+  }
+
+  li.navbar-link-item:first-child {
+    margin-left: 0;
+  }
+
+  li.navbar-link-item > a {
+    font-size: 1.6rem;
+    text-decoration: none;
+    color: var(--font-color);
+    --background-color: white;
+  }
+
+  ul.navbar-socials {
+    margin: 0;
+    height: 2.2rem;
+    margin-left: 8rem;
+  }
+
+  li.navbar-social-item {
+    height: 2.2rem;
+    margin-left: 2rem;
+  }
+
+  li.navbar-social-item:first-child {
+    margin-left: 0;
+  }
+
+  li.navbar-social-item > a {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  li.navbar-social-item > a > img {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  a.navbar-toggle {
+    display: none;
+  }
+}
